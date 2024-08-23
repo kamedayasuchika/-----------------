@@ -1,0 +1,81 @@
+.all_area{
+    text-align: center;
+}
+
+#Header_year_month{
+    font-weight: bold;
+    font-size: larger;
+}
+
+.all_area > button{
+    width: 3em;
+    height: 2em;
+}
+
+#calendartable{
+    min-width: 600px;
+    height: 350px;
+    margin: 20px auto 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+th,td{
+    border: 1px solid black;
+    width:calc(100% / 7)
+}
+
+td{
+    text-align: center;
+}
+
+
+tr th:first-child,td:first-child{
+    color: red;
+    background-color: rgb(250, 203, 203)
+}
+
+
+tr th:last-child,td:last-child{
+    color: blue;
+    background-color: aliceblue;
+}
+
+.no_data{
+    background-color: rgb(228, 227, 227);
+}
+
+#plantable{
+    min-width: 600px;
+    height: 50px;
+    margin: 20px auto 0;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+#plantable td{
+    background-color: white;
+    color: black;
+    width:calc(100% / 4)
+}
+
+.plan_area {
+    text-align: center;
+}
+
+#submit{
+    text-align: center;
+}
+
+#task_area{
+    text-align: center;
+}
+
+#display_task{
+    width: 8em;
+    height: 2em;
+}
+
+ul{
+    list-style: none;
+}
