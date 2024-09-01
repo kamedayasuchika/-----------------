@@ -41,6 +41,11 @@ tr th:last-child,td:last-child{
     background-color: aliceblue;
 }
 
+.hoilday_data{
+    color: red;
+    background-color: rgb(250, 203, 203)
+}
+
 .no_data{
     background-color: rgb(228, 227, 227);
 }

@@ -99,10 +99,42 @@ var Storageday; //登録ボタンを押下した際の日付
             tbody_tr.appendChild(tbody_td);
             tbody.appendChild(tbody_tr);
             countDay_plus_seven = countDay + plus_seven;
+            holidayclass(countDay , tbody_td);
         }
         table.appendChild(tbody);
         const calender = document.getElementById("calendar");
         calender.appendChild(table); 
+    }
+}
+
+//countDayが祝日か判定し、祝日の場合はクラス名を変更する関数
+function holidayclass(countDay , tbody_td){//配列holidayは2024-01-01の形式で登録されているので、countdayを配列hoildayと同じ形式に整形
+    let allday = String(year_month_create() + "-" + day_create(countDay));
+    let keyArray = Object.keys(holiday);
+    for(let i = 0; i < keyArray.length; i++){ 
+        if(allday == keyArray[i]){
+            tbody_td.classList.replace("in_data","hoilday_data");
+        }
+    }
+    
+}
+
+function year_month_create(){
+    if(month < 9){ //1月から9月には先頭に0をつける。
+        year_month = String(year) + "-" + "0" + (month + 1);
+        return year_month;
+    }else{
+        year_month = String(year) + "-" + (month + 1);  
+        return year_month;  
+    }
+}
+
+function day_create(countDay){
+    if(countDay < 10){
+        countDay = "0" + countDay;
+        return countDay;
+    }else{
+        return   countDay;
     }
 }
 
@@ -121,7 +153,6 @@ function last_year(){
     today.setFullYear(today.getFullYear() - 1);
     removeCalendar();
     Calendarheader(today);
-    year_month_create();
     removelist();
 }
 
@@ -130,7 +161,6 @@ function next_year(){
     today.setFullYear(today.getFullYear() + 1);
     removeCalendar();
     Calendarheader(today);
-    year_month_create();
     removelist();
 }
 
@@ -139,7 +169,6 @@ function last_month(){
     today.setMonth(today.getMonth() - 1);
     removeCalendar();
     Calendarheader(today); 
-    year_month_create();
     removelist();
 }
 
@@ -148,7 +177,6 @@ function next_month(){
     today.setMonth(today.getMonth() + 1,1);
     removeCalendar();
     Calendarheader(today);
-    year_month_create();
     removelist();
 }
 
@@ -157,7 +185,6 @@ function reset_year_month(){
     today = new Date();
     removeCalendar();
     Calendarheader(today);
-    year_month_create();
     removelist();
 }
 
@@ -216,7 +243,7 @@ function createTask(saveTasks_last) {
     }
 
     //登録ボタンが押下された際に走る関数
-    function submit(){
+    function submitplan(){
         let plan = document.getElementById("plan").value; //予定フォームの値
         let place = document.getElementById("place").value; //場所フォームの値
         let day = document.getElementById("day").value; //日付フォームの値
@@ -243,33 +270,36 @@ function createTask(saveTasks_last) {
             document.getElementById("day").value= "";
             document.getElementById("time_h").value= "";
             document.getElementById("time_m").value= "";
+            createTask(taskText);
+            taskText = "";
           }else if(plan == "" || place == "" || day == "" || time_h == "" || time_m == "" ){
             var result = window.confirm("予定を登録する際は、全て情報を入力してください。");
           }else if(year_month != Storageday){
             var result = window.confirm("予定を登録する際は、今月の情報を入力してください。");
-          }
+        }
     }
     
-    //フォームに一番最後に入力された情報を表示する
-    function display(){
-        if(taskText){
-            createTask(taskText);
-        }
-        taskText = "";
+    //入力された予定を表示する
+    function displayplan(){
+        //ローカルストレージを取得し、保存されている予定を表示
+            const displayplan = JSON.parse(localStorage.getItem(("tasks" + year_month)))
+            for(i = 0; i < displayplan.length; i++){
+                createTask(displayplan[i]);
+            }
     }
 
-    //ローカルストレージに保存されている情報を全て削除
-    function remove(){
-        if(JSON.parse(localStorage.getItem(("tasks" + year_month)))){
+    //ローカルストレージに保存されている予定を全て削除
+    function removeplan(){
+        if(JSON.parse(localStorage.getItem(("tasks" + year_month)))){ //ローカルストレージを取得し、表示されたダイアログのOKが押下された場合、予定の削除
             var result = window.confirm("登録した予定が消えてしまいます！");
             if(result){
                 localStorage.removeItem(("tasks" + year_month));
                 removelist();
-            
-        }
+            }
         }
     }
 
+    //作成した予定を削除
     function removelist(){
         var taskList = document.getElementById("task-list");
         while(taskList.firstChild){
@@ -280,7 +310,7 @@ function createTask(saveTasks_last) {
     //～時フォームのプルダウンリストの作成
     function create_h(){
         var all_h = [];
-        for(h = 0; h < 24; h++){
+        for(h = 0; h < 24; h++){//0時から9時の場合、先頭に0を足して00時～09時と表示
             let time_h = document.getElementById("time_h");
             if(h < 10){
                 hour = "0" + h;
@@ -300,7 +330,7 @@ function createTask(saveTasks_last) {
         var all_m = [];
         for(m = 0; m < 60; m++){
             let time_m = document.getElementById("time_m");
-            if(m < 10){
+            if(m < 10){ //0分から9分の場合、先頭に0を足して00分～09分と表示
                 minutes = "0" + m;
                 all_m.push(minutes);
             }else{
@@ -313,23 +343,63 @@ function createTask(saveTasks_last) {
         }
     }
 
-    function year_month_create(){
-        if((month + 1) < 10){
-            month = "0" + (month + 1);
-            year_month = String(year) + "-" + month; 
-        }else{
-            year_month = String(year) + "-" + month;   
-        }
-    }
-
-    async function getHolidaysOf(year) {
-        const url = `https://holidays-jp.github.io/api/v1/date.json?year=${year}`;
-        const response = await fetch(url);
-        const holidays = await response.json();
-        return holidays;
-      }
-      
-      (async () => {
-        const holidays2024 = await getHolidaysOf(2024);
-        console.log(holidays2024);
-      })();
+    //constで祝日一覧を配列として作成
+    const holiday = {
+        "2023-01-01": "元日",
+        "2023-01-02": "休日 元日",
+        "2023-01-09": "成人の日",
+        "2023-02-11": "建国記念の日",
+        "2023-02-23": "天皇誕生日",
+        "2023-03-21": "春分の日",
+        "2023-04-29": "昭和の日",
+        "2023-05-03": "憲法記念日",
+        "2023-05-04": "みどりの日",
+        "2023-05-05": "こどもの日",
+        "2023-07-17": "海の日",
+        "2023-08-11": "山の日",
+        "2023-09-18": "敬老の日",
+        "2023-09-23": "秋分の日",
+        "2023-10-09": "スポーツの日",
+        "2023-11-03": "文化の日",
+        "2023-11-23": "勤労感謝の日",
+        "2024-01-01": "元日",
+        "2024-01-08": "成人の日",
+        "2024-02-11": "建国記念の日",
+        "2024-02-12": "建国記念の日 振替休日",
+        "2024-02-23": "天皇誕生日",
+        "2024-03-20": "春分の日",
+        "2024-04-29": "昭和の日",
+        "2024-05-03": "憲法記念日",
+        "2024-05-04": "みどりの日",
+        "2024-05-05": "こどもの日",
+        "2024-05-06": "こどもの日 振替休日",
+        "2024-07-15": "海の日",
+        "2024-08-11": "山の日",
+        "2024-08-12": "休日 山の日",
+        "2024-09-16": "敬老の日",
+        "2024-09-22": "秋分の日",
+        "2024-09-23": "秋分の日 振替休日",
+        "2024-10-14": "スポーツの日",
+        "2024-11-03": "文化の日",
+        "2024-11-04": "文化の日 振替休日",
+        "2024-11-23": "勤労感謝の日",
+        "2025-01-01": "元日",
+        "2025-01-13": "成人の日",
+        "2025-02-11": "建国記念の日",
+        "2025-02-23": "天皇誕生日",
+        "2025-02-24": "天皇誕生日 振替休日",
+        "2025-03-20": "春分の日",
+        "2025-04-29": "昭和の日",
+        "2025-05-03": "憲法記念日",
+        "2025-05-04": "みどりの日",
+        "2025-05-05": "こどもの日",
+        "2025-05-06": "みどりの日 振替休日",
+        "2025-07-21": "海の日",
+        "2025-08-11": "山の日",
+        "2025-09-15": "敬老の日",
+        "2025-09-23": "秋分の日",
+        "2025-10-13": "スポーツの日",
+        "2025-11-03": "文化の日",
+        "2025-11-23": "勤労感謝の日",
+        "2025-11-24": "勤労感謝の日 振替休日"
+    };
