@@ -297,6 +297,7 @@ function createTask(saveTasks_last) {
             })
     }
 
+    
     function btnCancellation(){
         window.addEventListener("click" , function(){
             const btn = document.getElementById("display_task");
