@@ -154,6 +154,7 @@ function last_year(){
     removeCalendar();
     Calendarheader(today);
     removelist();
+    btnCancellation();
 }
 
 //来年のカレンダーを表示
@@ -162,6 +163,7 @@ function next_year(){
     removeCalendar();
     Calendarheader(today);
     removelist();
+    btnCancellation();
 }
 
 //先月のカレンダーを表示
@@ -170,6 +172,7 @@ function last_month(){
     removeCalendar();
     Calendarheader(today); 
     removelist();
+    btnCancellation();
 }
 
 //来月のカレンダーを表示
@@ -178,6 +181,7 @@ function next_month(){
     removeCalendar();
     Calendarheader(today);
     removelist();
+    btnCancellation();
 }
 
 //今日の月のカレンダーを表示
@@ -186,6 +190,7 @@ function reset_year_month(){
     removeCalendar();
     Calendarheader(today);
     removelist();
+    btnCancellation();
 }
 
 
@@ -286,6 +291,17 @@ function createTask(saveTasks_last) {
             for(i = 0; i < displayplan.length; i++){
                 createTask(displayplan[i]);
             }
+            window.addEventListener("click" , function(){
+                const btn = document.getElementById("display_task");
+                btn.setAttribute("style" , "pointer-events: none;")
+            })
+    }
+
+    function btnCancellation(){
+        window.addEventListener("click" , function(){
+            const btn = document.getElementById("display_task");
+            btn.setAttribute("style" , "")
+        })
     }
 
     //ローカルストレージに保存されている予定を全て削除
